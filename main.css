@@ -2,6 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 100px;
 }
 td {
   width: 32px;
@@ -28,4 +29,10 @@ td.slot {
 .slotsCanvas {
   background-color: #000;
   display: block;
+}
+.btn-slot-shown {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(158, 38, 38);
+  border: 1px solid rgb(124, 32, 32);
 }

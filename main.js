@@ -8,6 +8,7 @@ function start() {
   createMap();
   placeBombsRandomAndAddToSlots();
   renderSlots();
+  document.getElementById("btn-start").innerHTML = "Restart";
 }
 
 function createMap() {
@@ -68,7 +69,7 @@ function renderSlots() {
 
       html += "<td class='slot'>";
       html += showSlotArray[slotIndex]
-        ? `<button type='button' class='btn-slot' onclick="clickSlot(${slotIndex});">${slotValue}</button>`
+        ? `<button type='button' class='btn-slot-shown' onclick="clickSlot(${slotIndex});">${slotValue}</button>`
         : `<button type='button' class='btn-slot' onclick="clickSlot(${slotIndex});"></button>`;
       html += "</td>";
     }
