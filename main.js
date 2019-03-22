@@ -1,8 +1,8 @@
 const mapSlotsArray = [];
 const showSlotArray = [];
-let xSize = 10;
-let ySize = 10;
-let bombs = 10;
+let xSize = 15;
+let ySize = 15;
+let bombs = 50;
 
 function start() {
   createMap();
@@ -66,10 +66,14 @@ function renderSlots() {
     for (let column = 0; column < xSize; column++) {
       const slotIndex = column + ySize * row;
       const slotValue = mapSlotsArray[slotIndex];
+      let showValue = slotValue;
+      if(slotValue === 9){
+        showValue = "X";
+      }
 
       html += "<td class='slot'>";
       html += showSlotArray[slotIndex]
-        ? `<button type='button' class='btn-slot-shown' onclick="clickSlot(${slotIndex});">${slotValue}</button>`
+        ? `<button type='button' class='btn-slot-shown' onclick="clickSlot(${slotIndex});">${showValue}</button>`
         : `<button type='button' class='btn-slot' onclick="clickSlot(${slotIndex});"></button>`;
       html += "</td>";
     }
@@ -85,8 +89,42 @@ function renderSlots() {
 function clickSlot(slotIndex) {
   showSlotArray[slotIndex] = true;
   renderSlots();
-  if (mapSlotsArray[slotIndex] === 9) {
-    alert("Você perdeu!");
-    start();
+  const slotValue = mapSlotsArray[slotIndex];
+
+  if (slotValue === 9) {
+    endGame();
+    return;
+  }
+
+  if(slotValue === 0){
+    //checkZeroSlotsRepercursivily(slotIndex);
+
+    renderSlots();
+  }
+}
+
+function endGame(){
+  for(let i=0;i<(xSize * ySize);i++){
+    showSlotArray[i] = true;
+  }
+  renderSlots();
+}
+
+function checkZeroSlotsRepercursivily(slotIndex){
+  // (n - xSize) TOP
+  // (n - 1)     LEFT
+  // (n + 1)     RIGHT
+  // (n + xSize) BOTTOM
+  checkZeroSlotAndChangeVisibilityRep(slotIndex-xSize);
+  checkZeroSlotAndChangeVisibilityRep(slotIndex-1);
+  checkZeroSlotAndChangeVisibilityRep(slotIndex+1);
+  checkZeroSlotAndChangeVisibilityRep(slotIndex+xSize);
+}
+
+function checkZeroSlotAndChangeVisibilityRep(slotIndex){
+  if(mapSlotsArray[slotIndex] === 0)
+  {
+    showSlotArray[slotIndex] = true;
+    checkZeroSlotsRepercursivily(slotIndex);
   }
 }
