@@ -36,3 +36,9 @@ td.slot {
   background-color: rgb(158, 38, 38);
   border: 1px solid rgb(124, 32, 32);
 }
+.btn-slot-marked {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(38, 46, 158);
+  border: 1px solid rgb(38, 32, 124);
+}
