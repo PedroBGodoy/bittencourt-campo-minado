@@ -1,8 +1,11 @@
+html, body {
+  height: 100%;
+}
 .content_wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 100px;
+  height: 100%;
 }
 td {
   width: 32px;
@@ -16,11 +19,17 @@ td.slot {
   width: 50px;
   height: 50px;
 }
-.btn-slot {
+.btn-slot-grade0 {
   height: 100%;
   width: 100%;
-  background-color: rgb(177, 43, 43);
-  border: 1px solid rgb(124, 32, 32);
+  background-color: rgb(137, 186, 82);
+  border-width: 0;
+}
+.btn-slot-grade1 {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(153, 209, 90);
+  border-width: 0;
 }
 .btn-start {
   margin: 50px;
@@ -30,15 +39,42 @@ td.slot {
   background-color: #000;
   display: block;
 }
-.btn-slot-shown {
+.btn-slot-shown-grade0 {
   height: 100%;
   width: 100%;
-  background-color: rgb(158, 38, 38);
-  border: 1px solid rgb(124, 32, 32);
+  background-color: rgb(227, 200, 141);
+  border-width: 0;
+}
+.btn-slot-shown-grade1 {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(204, 182, 133);
+  border-width: 0;
 }
 .btn-slot-marked {
   height: 100%;
   width: 100%;
   background-color: rgb(38, 46, 158);
   border: 1px solid rgb(38, 32, 124);
+}
+.zero{
+  color: transparent;
+}
+.popup {
+  position: absolute; 
+  margin: auto; 
+  width: 100%; 
+  height: 200px; 
+  background-color: rgba(51, 51, 51, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.end-message {
+  color: white;
+  margin-top: 25px;
+}
+.btn-restart {
+  margin: auto;
 }
