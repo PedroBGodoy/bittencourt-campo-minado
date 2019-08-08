@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Campo Minado</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <link
       rel="stylesheet"
@@ -16,12 +18,14 @@
   </head>
   <body>
     <div class="container content_wrapper">
-      <button class="btn btn-light btn-start" onclick="start();" id="btn-start">
-        Start
-      </button>
-      <div class="text-center">
-        <div id="slotCanvas"></div>
+      <div class="popup" style="display: none;" id="popup">
+          <h1 class="text-center end-message" id="end_message">You Won!</h1>
+          <button class="btn btn-success btn-restart" onclick="start();" id="btn-start">Restart</button>
       </div>
+      <div id="slotCanvas"></div>
     </div>
+    <script>
+      start();
+    </script>
   </body>
 </html>
