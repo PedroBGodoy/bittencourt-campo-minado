@@ -1,14 +1,27 @@
 const mapSlotsArray = [];
 const showSlotArray = [];
 const markedSlotArray = [];
-let xSize = 15;
-let ySize = 15;
-let bombs = 20;
+
+const xSize = 15;
+const ySize = 15;
+const amountOfBombs = 30;
+
 let renderDifference = true;
+let gameEnded = false;
+let victory = false;
+let markedSlotsCount = 0;
+
+let firstClick = -1;
 
 function start() {
+  victory = false;
+  markedSlotsCount = 0;
+  gameEnded = false;
+  firstClick = -1;
+
+  $("#popup").hide();
+
   createMap();
-  placeBombsRandomAndAddToSlots();
   renderSlots();
   document.getElementById("btn-start").innerHTML = "Restart";
 }
@@ -27,11 +40,11 @@ function createMap() {
   markedSlotArray[numberOfSlots] = false;
 }
 
-function placeBombsRandomAndAddToSlots() {
-  for (let i = 0; i < bombs; i++) {
+function placeBombsRandomAndAddToSlots(slotIndex) {
+  for (let i = 0; i < amountOfBombs; i++) {
     const randomSlotNumber = Math.floor(Math.random() * mapSlotsArray.length);
 
-    if (mapSlotsArray[randomSlotNumber] !== 9) {
+    if (mapSlotsArray[randomSlotNumber] !== 9 && i != slotIndex) {
       mapSlotsArray[randomSlotNumber] = 9;
       addToSides(randomSlotNumber);
     } else {
@@ -42,12 +55,12 @@ function placeBombsRandomAndAddToSlots() {
 }
 
 function addToSides(slotIndex) {
-  doSomethingToAllSides(slotIndex, addToSlot);
+  doActionToAllSides(slotIndex, addToSlot);
 }
 
 function addToSlot(slotIndex) {
   if (
-    mapSlotsArray[slotIndex] === 9 ||
+    mapSlotsArray[slotIndex] == 9 ||
     slotIndex < 0 ||
     slotIndex >= xSize * ySize
   )
@@ -57,9 +70,19 @@ function addToSlot(slotIndex) {
 
 function renderSlots() {
   if (renderDifference) {
-    renderDifference = false;
+    let html = "";
 
-    let html = "<table class='slotsCanvas' cellpadding=0 cellspacing=0>";
+    if(gameEnded){
+      if(victory){
+        $("#end_message").html("You Won!");
+      } else{
+        $("#end_message").html("You Lost!");
+      }
+
+      $("#popup").show();
+    }
+
+    html += "<table class='slotsCanvas' cellpadding=0 cellspacing=0 style='margin: 25px'>";
 
     for (let row = 0; row < ySize; row++) {
       html += "<tr>";
@@ -68,21 +91,35 @@ function renderSlots() {
         const slotIndex = column + ySize * row;
         const slotValue = mapSlotsArray[slotIndex];
         let showValue = slotValue;
-        if (slotValue === 9) {
-          showValue = "#";
-        }
 
-        html +=
-          "<td class='slot' oncontextmenu='rightClick(\"" +
-          slotIndex +
-          "\"); return false;'>";
+        html += `<td class='slot' id='slot_${slotIndex}"' oncontextmenu='rightClick(event, ${slotIndex}); return false;'>`;
 
         if (markedSlotArray[slotIndex]) {
-          html += `<button type='button' class='btn-slot-marked' onclick=""></button>`;
+          if(slotIndex % 2 == 0){
+              html += `<button type='button' class='btn-slot-grade0' onclick=""><i class="fa fa-flag" style="color: rgb(222, 80, 58)"></i></button>`;
+            }else{
+              html += `<button type='button' class='btn-slot-grade1' onclick=""><i class="fa fa-flag" style="color: rgb(222, 80, 58)"></i></button>`;
+            }
         } else {
-          html += showSlotArray[slotIndex]
-            ? `<button type='button' class='btn-slot-shown' onclick="clickSlot(${slotIndex});">${showValue}</button>`
-            : `<button type='button' class='btn-slot' onclick="clickSlot(${slotIndex});"></button>`;
+          let className = slotIndex % 2 == 0 ? "btn-slot-shown-grade1" : "btn-slot-shown-grade0";
+          
+          className += slotValue == 0 ? " zero" : "";
+          className += slotValue == 9 ? " bomb" : "";
+
+          if(showSlotArray[slotIndex]){
+            if(slotValue == 9){
+              html += `<button type='button' class='${className}' onclick=""><i class="fa fa-bomb"></i></button>`;
+            }else{
+              html += `<button type='button' class='${className}' onclick="">${slotValue}</button>`;
+            }
+
+          }else{
+            if(slotIndex % 2 == 0){
+              html += `<button type='button' class='btn-slot-grade0' onclick="clickSlot(${slotIndex});"></button>`;
+            }else{
+              html += `<button type='button' class='btn-slot-grade1' onclick="clickSlot(${slotIndex});"></button>`;
+            }
+          }
         }
 
         html += "</td>";
@@ -94,6 +131,8 @@ function renderSlots() {
     html += "</table>";
 
     document.querySelector("#slotCanvas").innerHTML = html;
+
+    renderDifference = false;    
   }
 
   setTimeout(() => {
@@ -101,78 +140,105 @@ function renderSlots() {
   }, 10);
 }
 
-function rightClick(slotIndex) {
-  if (!showSlotArray[slotIndex]) {
-    if (markedSlotArray[slotIndex]) {
-      markedSlotArray[slotIndex] = false;
-      renderDifference = true;
-    } else {
-      markedSlotArray[slotIndex] = true;
-      renderDifference = true;
-    }
+function rightClick(event, slotIndex) {
+  event.preventDefault();
+
+  if (showSlotArray[slotIndex]){
+    return;
   }
+  
+  if(markedSlotArray[slotIndex]){
+    markedSlotsCount--;
+  }else{
+    if(markedSlotsCount >= amountOfBombs){
+      return;
+    }
+    markedSlotsCount++;
+  }
+
+  markedSlotArray[slotIndex] = !markedSlotArray[slotIndex];
+  renderDifference = true;
+
+  checkVictory();
 }
 
 function clickSlot(slotIndex) {
-  showSlotArray[slotIndex] = true;
-  const slotValue = mapSlotsArray[slotIndex];
-  renderDifference = true;
-
-  if (slotValue === 9) {
-    endGame();
-    return;
+  if(firstClick == -1){
+    firstClick = slotIndex;
+    placeBombsRandomAndAddToSlots(slotIndex);
   }
 
+  const slotValue = mapSlotsArray[slotIndex];
+
+  if (slotValue == 9) {
+    lose();
+    return;
+  }else
+    openSlot(slotIndex);
+
+  renderDifference = true;
+}
+
+function openSlot(slotIndex) {
   if (checkIfZeroAndClosed(slotIndex)) {
+    showSlotArray[slotIndex] = true;
+    renderDifference = true;
     openSides(slotIndex);
-    checkSidesAndOpenZeros(slotIndex);
+  }else{
+    showSlotArray[slotIndex] = true;
+    renderDifference = true;
   }
 }
 
 function checkIfZeroAndClosed(slotIndex) {
-  if (mapSlotsArray[slotIndex] === 0 && showSlotArray[slotIndex]) {
+  if (mapSlotsArray[slotIndex] == 0 && !showSlotArray[slotIndex]) 
     return true;
-  }
 
   return false;
 }
 
 function openSides(slotIndex) {
-  doSomethingToAllSides(slotIndex, openSlot);
+  doActionToAllSides(slotIndex, openSlot);
 }
 
-function checkSidesAndOpenZeros(slotIndex) {
-  doSomethingToAllSides(slotIndex, checkSideAndOpen);
-}
-
-function checkSideAndOpen(slotIndex) {
-  if (!checkIfZeroAndClosed(slotIndex)) return;
-
-  openSides(slotIndex);
-  checkSidesAndOpenZeros(slotIndex);
-}
-
-function openSlot(slotIndex) {
-  showSlotArray[slotIndex] = true;
-  renderDifference = true;
-}
-
-function endGame() {
-  for (let i = 0; i < xSize * ySize; i++) {
-    showSlotArray[i] = true;
+function checkVictory(){
+  let markedBombsCount = 0;
+  for(let i = 0; i < xSize * ySize; i++){
+    if(mapSlotsArray[i] == 9 && markedSlotArray[i])
+      markedBombsCount++;
   }
+
+  if(markedBombsCount == amountOfBombs)
+    win();
+}
+
+function win(){
+  victory = true;
+  gameEnded = true;
+  showAll();
+}
+
+function lose(){
+  gameEnded = true;
+  showAll();
+}
+
+function showAll() {
+  for (let i = 0; i < xSize * ySize; i++)
+    showSlotArray[i] = true;
+
   renderDifference = true;
 }
 
 /// UTILITY
-function doSomethingToDirectSides(slotIndex, action) {
+function doActionToDirectSides(slotIndex, action) {
   action(slotIndex - xSize);
   action(slotIndex - 1);
   action(slotIndex + 1);
   action(slotIndex + xSize);
 }
 
-function doSomethingToAllSides(slotIndex, action) {
+function doActionToAllSides(slotIndex, action) {
   action(slotIndex - xSize - 1);
   action(slotIndex - xSize);
   action(slotIndex - xSize + 1);
